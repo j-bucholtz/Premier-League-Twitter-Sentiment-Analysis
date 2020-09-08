@@ -39,7 +39,7 @@ def build_url(parameters: dict) -> str:
     return url
 
 
-def connect_to_endpoint(url, headers):
+def connect_to_endpoint(url, headers) -> None:
     """Stream Tweets from the URL"""
     response = requests.request("GET", url, headers=headers, stream=True)
     for tweet in response.iter_lines():
@@ -50,7 +50,7 @@ def connect_to_endpoint(url, headers):
             raise Exception(f"Request returned an error: {response.status_code}, {response.text}")
 
 
-def main():
+def main() -> None:
     bearer_token = get_bearer_token()
     headers = build_headers(bearer_token)
     api_parameters = get_api_parameters()
