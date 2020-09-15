@@ -3,9 +3,8 @@ Stream Tweets from the Twitter filtered stream API.
 """
 import configparser
 import json
-import pprint
 from typing import Dict
-from urllib.parse import urlparse
+from typing import Tuple
 
 import requests
 
@@ -17,11 +16,13 @@ def get_bearer_token() -> str:
     return credentials["twitter_api"]["bearer_token"]
 
 
-def get_api_parameters() -> Dict[str, str]:
+def get_api_parameters() -> Tuple[str, Dict[str, str]]:
     """Get API parameters from api config"""
     api_parameters = configparser.ConfigParser(interpolation=None)
     api_parameters.read("./config/twitter_api_parameters.ini")
-    return dict(api_parameters["stream_parameters"])
+    endpoint = api_parameters["general"]["endpoint"]
+    query_parameters = dict(api_parameters["query_parameters"])
+    return (endpoint, query_parameters)
 
 
 def build_headers(bearer_token: str) -> str:
@@ -30,34 +31,23 @@ def build_headers(bearer_token: str) -> str:
     return headers
 
 
-def build_url(parameters: dict) -> str:
-    """Returns a URL including Tweet fields, expansions, etc"""
-    # TODO: Loop over entire dict and for each key create key=values
-    # Use urllib.parse
-    url = f"{parameters.get('endpoint')}?tweet.fields={parameters.get('tweet.fields')}"\
-            f"&expansions={parameters.get('expansions')}"
-    return url
-
-
-def connect_to_endpoint(url, headers) -> None:
-    """Stream Tweets from the URL"""
-    response = requests.request("GET", url, headers=headers, stream=True)
+def connect_to_stream(url, headers, parameters=None) -> None:
+    """Stream Tweets from the URL using the parameters"""
+    response = requests.get(url, params=parameters, headers=headers, stream=True)
+    if response.status_code != 200:
+        raise Exception(f"Request returned an error: {response.status_code}, {response.text}")
     for tweet in response.iter_lines():
         if tweet:
             json_response = json.loads(tweet)
-            pprint.pprint(json.dumps(json_response, sort_keys=True))
-        if response.status_code != 200:
-            raise Exception(f"Request returned an error: {response.status_code}, {response.text}")
-
+            print(json.dumps(json_response, indent=4, sort_keys=True))
 
 def main() -> None:
     bearer_token = get_bearer_token()
     headers = build_headers(bearer_token)
     api_parameters = get_api_parameters()
-    streaming_url = build_url(api_parameters)
     timeout = 0
     while True:
-        connect_to_endpoint(streaming_url, headers)
+        connect_to_stream(api_parameters[0], headers, parameters=api_parameters[1])
         timeout += 1
 
 
