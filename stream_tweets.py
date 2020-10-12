@@ -52,7 +52,7 @@ def get_rules(headers) -> bool:
     return response.json()
 
 
-def delete_all_rules(headers, rules):
+def delete_all_rules(headers, rules) -> bool:
     """Delete all filtered stream rules."""
     if rules is None or "data" not in rules:
         return False
@@ -73,7 +73,7 @@ def delete_all_rules(headers, rules):
     return True
 
 
-def set_rules(headers):
+def set_rules(headers) -> bool:
     """Set filtered stream rules."""
     sample_rules = [
         {"value": "context:12.731226203856637952 lang:en", "tag": "Man City"}
@@ -89,6 +89,7 @@ def set_rules(headers):
             "Cannot add rules (HTTP {}): {}".format(response.status_code, response.text)
         )
     print(json.dumps(response.json()))
+    return True
 
 
 def get_api_parameters() -> Tuple[str, Dict[str, str]]:
