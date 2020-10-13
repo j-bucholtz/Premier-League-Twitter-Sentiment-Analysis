@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "premier-league-twitter-sentiment"
+version = "0.1.0"
+description = "Analyze the sentiment of Tweets discussing the Premier League."
+authors = ["j-bucholtz"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.24.0"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.8.4"
+mypy = "^0.790"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
