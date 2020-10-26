@@ -133,6 +133,3 @@ credentials.*
 
 # Vim
 .vim/
-
-# Poetry
-poetry.lock
